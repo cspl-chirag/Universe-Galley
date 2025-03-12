@@ -34,14 +34,14 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void getMediaFiles() {
+        folderList.clear();
+        folderMap.clear();
+
         Uri uri = MediaStore.Files.getContentUri("external");
         String[] projection = {
                 MediaStore.Files.FileColumns._ID,
                 MediaStore.Files.FileColumns.DATA,
-                MediaStore.Files.FileColumns.DATE_ADDED,
-                MediaStore.Files.FileColumns.MEDIA_TYPE,
-                MediaStore.Files.FileColumns.MIME_TYPE,
-                MediaStore.Files.FileColumns.TITLE
+                MediaStore.Files.FileColumns.MEDIA_TYPE
         };
 
         String selection = MediaStore.Files.FileColumns.MEDIA_TYPE + "=? OR " +
@@ -52,11 +52,13 @@ public class MainActivity extends AppCompatActivity {
                 String.valueOf(MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO)
         };
 
-        Cursor cursor = getContentResolver().query(uri, projection, selection, selectionArgs, null);
+        Cursor cursor = getContentResolver().query(uri, projection, selection, selectionArgs, MediaStore.Files.FileColumns.DATE_ADDED + " DESC");
         if (cursor != null) {
             while (cursor.moveToNext()) {
                 String filePath = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Files.FileColumns.DATA));
                 File file = new File(filePath);
+                if (!file.exists()) continue;
+
                 String folderName = file.getParentFile().getName();
                 if (!folderMap.containsKey(folderName)) {
                     folderMap.put(folderName, new ArrayList<>());
@@ -66,7 +68,9 @@ public class MainActivity extends AppCompatActivity {
             }
             cursor.close();
         }
+
         FolderAdapter adapter = new FolderAdapter(this, folderList, folderMap);
         recyclerView.setAdapter(adapter);
     }
+
 }

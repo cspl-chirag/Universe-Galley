@@ -52,7 +52,8 @@ public class FolderAdapter extends RecyclerView.Adapter<FolderAdapter.ViewHolder
 
         holder.itemView.setOnClickListener(v -> {
             Intent intent = new Intent(context, MediaActivity.class);
-            intent.putStringArrayListExtra("mediaList", folderMap.get(folderName));
+            intent.putExtra("folderName", folderName); // Pass folder name
+            intent.putStringArrayListExtra("mediaList", folderMap.get(folderName)); // Pass media list
             context.startActivity(intent);
         });
     }
